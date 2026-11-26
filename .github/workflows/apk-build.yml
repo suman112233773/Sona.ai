@@ -1,0 +1,45 @@
+
+name: Build SONA AI APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Extract SONA AI Project
+        run: |
+          unzip -q SONA_AI_Android_GitHub_Build.zip -d extracted
+          cp -R extracted/SONA_AI_Android/. .
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Build Android APK
+        run: gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SONA-AI-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
+          
